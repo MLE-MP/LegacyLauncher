@@ -5,7 +5,7 @@ const https = require('https');
 const extractZip = require('extract-zip');
 const childProcess = require('child_process');
 
-const DEFAULT_REPO = "smartcmd/MinecraftConsoles";
+const DEFAULT_REPO = "MLE-MP/MinecraftConsoles";
 const DEFAULT_EXEC = "Minecraft.Client.exe";
 const TARGET_FILE = "LCEWindows64.zip";
 
