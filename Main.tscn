@@ -23,6 +23,7 @@ grow_vertical = 2
 metadata/_edit_use_anchors_ = true
 
 [node name="TextureRect" type="TextureRect" parent="VBoxContainer" unique_id=290087918]
+self_modulate = Color(0.3553136, 0.35531354, 0.35531357, 1)
 texture_repeat = 1
 layout_mode = 2
 size_flags_vertical = 3
