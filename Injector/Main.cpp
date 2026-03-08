@@ -2,92 +2,87 @@
 #include <windows.h>
 #include "Libs/Window/WindowHelper.h"
 #include <string>
-//#include "Libs/TCP/Client/TCPClient.h"
-//#include "Libs/TCP/PacketHandler.h"
+#include "Libs/TCP/Client/TCPClient.h"
+#include "Libs/TCP/PacketHandler.h"
 //#include "Libs/TCP/Packet/Types/ServerboundLoginPacket.h"
 #include "Libs/Config/Config.h"
 //#include "Libs/TCP/Packet/Types/ClientboundObfuscationPacket.h"
 
-//#include "Libs/TCP/Packet/Types/ServerboundRegisterAccountPacket.h"
+#include "Libs/TCP/Packet/Types/ServerboundRegisterAccountPacket.h"
 
-//#include "Libs/TCP/Packet/Types/ClientboundAccountErrorPacket.h"
-#include "Libs/TCP/Client/ServerCommunication.h"
+#include "Libs/TCP/Packet/Types/ClientboundAccountErrorPacket.h"
+//#include "Libs/TCP/Client/ServerCommunication.h"
 
 
 static WindowHelper* mainWindow = NULL;
-//static TCPClient* serverConnection = NULL;
+static TCPClient* serverConnection = NULL;
 static Config* configSystem = NULL;
 
 void drawWindowContent();
-//void handlePacket(const BasePacket* packet);
+void handlePacket(const BasePacket* packet);
 //std::string GetMachineGuid(); //could be better but i dont give a shit just needs to be basic
 
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, char* pCmdLine, int nCmdShow) {
     configSystem = new Config("Injector");
-    //serverConnection = new TCPClient();
+    serverConnection = new TCPClient();
 
     mainWindow = new WindowHelper("Injector", "INJECTOR");
     mainWindow->onContentDraw = drawWindowContent;
 
-    //PacketHandler::onPacket(handlePacket);
+    PacketHandler::onPacket(handlePacket);
 
-    //serverConnection->setOnMessage(PacketHandler::feed);
-    //serverConnection->connectToServer("38.49.215.81", 2053);
+    serverConnection->setOnMessage(PacketHandler::feed);
+    serverConnection->connectToServer("38.49.215.81", 2053);
 
     //this will capture main thread and prevent code below from calling till program exit
     mainWindow->StartWindow(hInstance); 
 
     //do any cleanup here
 
-    //delete serverConnection;
+    delete serverConnection;
     delete configSystem;
     delete mainWindow;
 }
 
-//void handlePacket(const BasePacket* packet) {
-//    if (packet->getPacketType() == PacketTypes::RegisterAccount) {
-//        ClientboundAccountErrorPacket* castedPacket = (ClientboundAccountErrorPacket*)packet;
-//        errorHolder = castedPacket->getError();
-//    }
-//    /*if (packet->getPacketType() == PacketTypes::StartObfuscation) {
-//        ClientboundObfuscationPacket* castedPacket = (ClientboundObfuscationPacket*)(packet);
-//        BasePacket::readyObfuscation(castedPacket->getKey());
-//        
-//        
-//    }*/
-//}
+void handlePacket(const BasePacket* packet) {
+    if (packet->getPacketType() == PacketTypes::RegisterAccount) {
+        ClientboundAccountErrorPacket* castedPacket = (ClientboundAccountErrorPacket*)packet;
+        errorHolder = castedPacket->getError();
+    }
+    /*if (packet->getPacketType() == PacketTypes::StartObfuscation) {
+        ClientboundObfuscationPacket* castedPacket = (ClientboundObfuscationPacket*)(packet);
+        BasePacket::readyObfuscation(castedPacket->getKey());
+        
+        
+    }*/
+}
 
 std::string errorHolder = "";
 
 
 void drawWindowContent() {
-
-    //ImGui::Text(PacketHandler::debug.c_str());
-
-    if (!errorHolder.empty()) {
-        ImGui::Text("%s", errorHolder.c_str());
-    }
-
-    static char username_inputBuffer[16];
-    static char password_inputBuffer[64];
-
-    ImGui::InputText("Username", username_inputBuffer, 16);
-    ImGui::InputText("Password", password_inputBuffer, 64);
-
-    if (ImGui::Button("Send Request")) {
-        RegistrationResponse response = ServerCommunication::AttemptRegistration(username_inputBuffer, password_inputBuffer);
-        if (response.DidError()) {
-            errorHolder = response.GetError();
-        }
-    }
-    /*if (serverConnection->isSocketValid() && serverConnection->isRunning()) {
+    if (serverConnection->isSocketValid() && serverConnection->isRunning()) {
         ImGui::Text("Socket Valid");
 
         if (!errorHolder.empty()) {
             ImGui::Text("%s", errorHolder.c_str());
         }
 
-        
+        ImGui::Text(PacketHandler::debug.c_str());
+
+        static char username_inputBuffer[16];
+        static char password_inputBuffer[64];
+
+        ImGui::InputText("Username", username_inputBuffer, 16);
+        ImGui::InputText("Password", password_inputBuffer, 64);
+
+        if (ImGui::Button("Send Request")) {
+            ServerboundRegisterAccountPacket* registerPacket = new ServerboundRegisterAccountPacket(username_inputBuffer, password_inputBuffer);
+
+            serverConnection->sendMessage(registerPacket->getString());
+
+            delete registerPacket;
+        }
 
         /*if (BasePacket::isObfuscationReady()) {
 
@@ -124,14 +119,14 @@ void drawWindowContent() {
 
                 delete loginPacket;
             }
-        }
+        }*/
     } else {
         ImGui::Text("Attempting Connection To Legacy Online Services");
 
         if (!serverConnection->isConnecting()) {
             serverConnection->connectToServer("38.49.215.81", 2053);
         }
-    }*/
+    }
 }
 
 
