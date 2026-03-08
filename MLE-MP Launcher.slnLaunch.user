@@ -1,0 +1,25 @@
+[
+  {
+    "Name": "Build All",
+    "Projects": [
+      {
+        "Path": "MainDLL\\MainDLL.vcxproj",
+        "Action": "StartWithoutDebugging"
+      },
+      {
+        "Path": "Injector\\Injector.vcxproj",
+        "Action": "Start",
+        "DebugTarget": "Local Windows Debugger"
+      }
+    ]
+  },
+  {
+    "Name": "Build Injector",
+    "Projects": [
+      {
+        "Path": "Injector\\Injector.vcxproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]
